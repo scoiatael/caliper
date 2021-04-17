@@ -5,4 +5,5 @@ authors = ["Lukasz Czaplinski <git@scoiatael.dev>"]
 edition = "2018"
 
 [dependencies]
-iced = { version = "0.3", features=["canvas"] }
+iced = { version = "0.3", features=["canvas", "image"] }
+nfd2 = "0.3"
