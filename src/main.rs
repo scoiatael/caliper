@@ -1,4 +1,3 @@
-//! This example showcases an interactive `Canvas` for drawing Bézier curves.
 use iced::{
     button, executor, image, Align, Application, Button, Clipboard, Column, Command, Container,
     Element, Length, Settings, Text,
@@ -6,6 +5,7 @@ use iced::{
 use nfd2::Response;
 
 mod bezier;
+mod canvas_over_image;
 
 #[derive(Debug, Clone)]
 struct OpenDialogError;
@@ -73,7 +73,7 @@ impl Application for Example {
     }
 
     fn title(&self) -> String {
-        String::from("Bezier tool - Iced")
+        String::from("Caliper - Iced")
     }
 
     fn update(&mut self, message: Message, _clipboard: &mut Clipboard) -> iced::Command<Message> {
@@ -91,21 +91,30 @@ impl Application for Example {
     }
 
     fn view(&mut self) -> Element<Message> {
+        let img: Element<bezier::Curve> = Container::new(image::Image::new(self.img.clone()))
+            .width(Length::Fill)
+            .height(Length::Fill)
+            .into();
+
+        let overlay: Element<bezier::Curve> = canvas_over_image::CanvasOverImage::new(
+            Container::new(self.bezier.view(&self.curves))
+                .width(Length::Fill)
+                .height(Length::Fill)
+                .into(),
+            img,
+        )
+        .into();
+
         Column::new()
             .padding(20)
             .spacing(20)
             .align_items(Align::Center)
             .push(
-                Text::new("Bezier tool example")
+                Text::new("TODO: menu, scaling, save, export")
                     .width(Length::Shrink)
                     .size(50),
             )
-            .push(
-                Container::new(image::Image::new(self.img.clone()))
-                    .width(Length::Fill)
-                    .height(Length::Fill),
-            )
-            .push(self.bezier.view(&self.curves).map(Message::AddCurve))
+            .push(overlay.map(Message::AddCurve))
             .push(
                 Button::new(&mut self.button_state, Text::new("Clear"))
                     .padding(8)

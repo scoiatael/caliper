@@ -5,5 +5,7 @@ authors = ["Lukasz Czaplinski <git@scoiatael.dev>"]
 edition = "2018"
 
 [dependencies]
-iced = { version = "0.3", features=["canvas", "image"] }
+iced = { git = "https://github.com/hecrj/iced", features=["canvas", "image", "debug"] }
+iced_graphics = { git = "https://github.com/hecrj/iced" }
+iced_native = { git = "https://github.com/hecrj/iced" }
 nfd2 = "0.3"
