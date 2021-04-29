@@ -10,11 +10,28 @@ pub struct State {
     cache: canvas::Cache,
 }
 
+#[derive(Default, Clone)]
+pub struct Curves(Vec<Curve>);
+
+impl Curves {
+    pub fn push(&mut self, c: Curve) {
+        self.0.push(c)
+    }
+
+    pub fn clear(&mut self) {
+        self.0.clear()
+    }
+
+    pub fn iter(&self) -> std::slice::Iter<Curve> {
+        self.0.iter()
+    }
+}
+
 impl State {
-    pub fn view<'a>(&'a mut self, curves: &'a [Curve]) -> Element<'a, Curve> {
+    pub fn view<'a>(&'a mut self, curves: &'a Curves) -> Element<'a, Curve> {
         Canvas::new(Bezier {
             state: self,
-            curves,
+            curves: &curves.0,
         })
         .width(Length::Fill)
         .height(Length::Fill)
@@ -127,6 +144,21 @@ impl Curve {
         });
 
         frame.stroke(&curves, Stroke::default().with_width(2.0));
+    }
+
+    pub fn export(&self) -> svg::node::element::Path {
+        use svg::node::element::path::Data;
+        use svg::node::element::Path;
+
+        let data = Data::new()
+            .move_to((self.from.x, self.from.y))
+            .quadratic_curve_to(((self.control.x, self.control.y), (self.to.x, self.to.y)));
+
+        return Path::new()
+            .set("fill", "none")
+            .set("stroke", "black")
+            .set("stroke-width", 3)
+            .set("d", data);
     }
 }
 

@@ -170,9 +170,12 @@ name = "caliper"
 version = "0.1.0"
 dependencies = [
  "iced",
+ "iced_futures",
  "iced_graphics",
  "iced_native",
  "nfd2",
+ "svg",
+ "tokio",
 ]
 
 [[package]]
@@ -1228,6 +1231,7 @@ source = "git+https://github.com/hecrj/iced#4b8ba8309f6645cdcb5bd605f8dd88097f8e
 dependencies = [
  "futures",
  "log",
+ "tokio",
  "wasm-bindgen-futures",
 ]
 
@@ -2480,6 +2484,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6446ced80d6c486436db5c078dde11a9f73d42b57fb273121e160b84f63d894c"
 
 [[package]]
+name = "svg"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a95656b5b37251de210aa2751d538b6f31ce375bacf725a32223bfa6344e0776"
+
+[[package]]
 name = "svg_fmt"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2569,6 +2579,29 @@ name = "tinyvec_macros"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cda74da7e1a664f795bb1f8a87ec406fb89a02522cf6e50620d016add6dbbf5c"
+
+[[package]]
+name = "tokio"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "83f0c8e7c0addab50b663055baf787d0af7f413a46e6e7fb9559a4e4db7137a5"
+dependencies = [
+ "autocfg",
+ "num_cpus",
+ "pin-project-lite",
+ "tokio-macros",
+]
+
+[[package]]
+name = "tokio-macros"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "caf7b11a536f46a809a8a9f0bb4237020f70ecbf115b842360afb127ea2fda57"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
 
 [[package]]
 name = "toml"

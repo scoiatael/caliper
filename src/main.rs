@@ -1,11 +1,14 @@
 use iced::{
-    executor, image, Align, Application, Clipboard, Column, Command, Container, Element, Length,
-    Row, Settings, Text,
+    image, Align, Application, Clipboard, Column, Command, Container, Element, Length, Row,
+    Settings, Text,
 };
+use iced_futures;
+use std::path::PathBuf;
 
 mod bezier;
 mod canvas_over_image;
 mod dialog;
+mod export;
 mod menu;
 
 pub fn main() -> iced::Result {
@@ -21,8 +24,9 @@ pub fn main() -> iced::Result {
 }
 
 struct AppState {
+    path: PathBuf,
     bezier: bezier::State,
-    curves: Vec<bezier::Curve>,
+    curves: bezier::Curves,
     img: image::Handle,
     menu: menu::State,
     sidebar: bool,
@@ -41,14 +45,16 @@ struct Flags {
 
 impl Application for AppState {
     type Message = Message;
-    type Executor = executor::Default;
+    type Executor = iced_futures::executor::Tokio;
     type Flags = Flags;
 
     fn new(flags: Self::Flags) -> (AppState, Command<Self::Message>) {
+        let path = flags.file.expect("file missing?");
         let default = AppState {
-            img: image::Handle::from_path(flags.file.expect("file missing?")),
+            path: path.clone(),
+            img: image::Handle::from_path(path),
             bezier: bezier::State::default(),
-            curves: Vec::default(),
+            curves: bezier::Curves::default(),
             menu: menu::State::default(),
             sidebar: false,
         };
@@ -64,16 +70,24 @@ impl Application for AppState {
             Message::AddCurve(curve) => {
                 self.curves.push(curve);
                 self.bezier.request_redraw();
+                Command::none()
             }
             Message::FromMenu(menu::Message::Clear) => {
                 self.bezier = bezier::State::default();
                 self.curves.clear();
+                Command::none()
             }
             Message::FromMenu(menu::Message::Sidebar) => {
                 self.sidebar = !self.sidebar;
+                Command::none()
             }
-        };
-        Command::none()
+            Message::FromMenu(menu::Message::Export) => {
+                let mut dst = self.path.clone();
+                dst.set_extension(".clp.svg");
+                let _ = export::run(&self.curves, &dst);
+                Command::none()
+            }
+        }
     }
 
     fn view(&mut self) -> Element<Message> {

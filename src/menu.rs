@@ -13,6 +13,7 @@ pub struct State {
 pub enum Message {
     Clear,
     Sidebar,
+    Export,
 }
 
 fn icon<A>(name: &str) -> Element<A> {
@@ -47,7 +48,7 @@ impl State {
             .push(
                 Button::new(&mut self.export, icon("solid/file-export"))
                     .padding(8)
-                    .on_press(Message::Clear),
+                    .on_press(Message::Export),
             )
             .push(
                 Button::new(&mut self.side_bar, icon("solid/list"))
