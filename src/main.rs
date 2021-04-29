@@ -30,7 +30,7 @@ pub fn main() -> iced::Result {
     }
     .expect("failed open dialog");
 
-    Example::run(Settings {
+    AppState::run(Settings {
         antialiasing: true,
         flags: (Flags {
             file: Option::Some(path),
@@ -39,7 +39,7 @@ pub fn main() -> iced::Result {
     })
 }
 
-struct Example {
+struct AppState {
     bezier: bezier::State,
     curves: Vec<bezier::Curve>,
     button_state: button::State,
@@ -57,13 +57,13 @@ struct Flags {
     file: Option<std::path::PathBuf>,
 }
 
-impl Application for Example {
+impl Application for AppState {
     type Message = Message;
     type Executor = executor::Default;
     type Flags = Flags;
 
-    fn new(flags: Self::Flags) -> (Example, Command<Self::Message>) {
-        let example = Example {
+    fn new(flags: Self::Flags) -> (AppState, Command<Self::Message>) {
+        let example = AppState {
             img: image::Handle::from_path(flags.file.expect("file missing?")),
             bezier: bezier::State::default(),
             curves: Vec::default(),
