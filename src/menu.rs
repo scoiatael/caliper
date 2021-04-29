@@ -12,6 +12,7 @@ pub struct State {
 #[derive(Debug, Clone, Copy)]
 pub enum Message {
     Clear,
+    Sidebar,
 }
 
 fn icon<A>(name: &str) -> Element<A> {
@@ -51,7 +52,7 @@ impl State {
             .push(
                 Button::new(&mut self.side_bar, icon("solid/list"))
                     .padding(8)
-                    .on_press(Message::Clear),
+                    .on_press(Message::Sidebar),
             )
             .into()
     }

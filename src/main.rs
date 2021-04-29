@@ -1,6 +1,6 @@
 use iced::{
     executor, image, Align, Application, Clipboard, Column, Command, Container, Element, Length,
-    Settings,
+    Row, Settings, Text,
 };
 use nfd2::Response;
 
@@ -45,6 +45,7 @@ struct AppState {
     curves: Vec<bezier::Curve>,
     img: image::Handle,
     menu: menu::State,
+    sidebar: bool,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -69,6 +70,7 @@ impl Application for AppState {
             bezier: bezier::State::default(),
             curves: Vec::default(),
             menu: menu::State::default(),
+            sidebar: false,
         };
         (default, Command::none())
     }
@@ -86,6 +88,9 @@ impl Application for AppState {
             Message::FromMenu(menu::Message::Clear) => {
                 self.bezier = bezier::State::default();
                 self.curves.clear();
+            }
+            Message::FromMenu(menu::Message::Sidebar) => {
+                self.sidebar = !self.sidebar;
             }
         };
         Command::none()
@@ -106,12 +111,25 @@ impl Application for AppState {
         )
         .into();
 
+        let overlay_with_sidebar: Element<Message> = if self.sidebar {
+            let mut curves: Column<Message> = Column::new();
+            for (idx, curve) in self.curves.iter().enumerate() {
+                curves = curves.push(Text::new(format!("{} - {:?}", idx, curve)));
+            }
+            Row::new()
+                .push(curves)
+                .push(overlay.map(Message::AddCurve))
+                .into()
+        } else {
+            overlay.map(Message::AddCurve)
+        };
+
         Column::new()
             .padding(20)
             .spacing(20)
             .align_items(Align::Center)
             .push(self.menu.view().map(Message::FromMenu))
-            .push(overlay.map(Message::AddCurve))
+            .push(overlay_with_sidebar)
             .into()
     }
 }
