@@ -1,11 +1,12 @@
 use iced::{
-    button, executor, image, Align, Application, Button, Clipboard, Column, Command, Container,
-    Element, Length, Settings, Text,
+    executor, image, Align, Application, Clipboard, Column, Command, Container, Element, Length,
+    Settings,
 };
 use nfd2::Response;
 
 mod bezier;
 mod canvas_over_image;
+mod menu;
 
 #[derive(Debug, Clone)]
 struct OpenDialogError;
@@ -42,14 +43,14 @@ pub fn main() -> iced::Result {
 struct AppState {
     bezier: bezier::State,
     curves: Vec<bezier::Curve>,
-    button_state: button::State,
     img: image::Handle,
+    menu: menu::State,
 }
 
 #[derive(Debug, Clone, Copy)]
 enum Message {
     AddCurve(bezier::Curve),
-    Clear,
+    FromMenu(menu::Message),
 }
 
 #[derive(Debug, Clone, Default)]
@@ -63,13 +64,13 @@ impl Application for AppState {
     type Flags = Flags;
 
     fn new(flags: Self::Flags) -> (AppState, Command<Self::Message>) {
-        let example = AppState {
+        let default = AppState {
             img: image::Handle::from_path(flags.file.expect("file missing?")),
             bezier: bezier::State::default(),
             curves: Vec::default(),
-            button_state: button::State::default(),
+            menu: menu::State::default(),
         };
-        (example, Command::none())
+        (default, Command::none())
     }
 
     fn title(&self) -> String {
@@ -82,7 +83,7 @@ impl Application for AppState {
                 self.curves.push(curve);
                 self.bezier.request_redraw();
             }
-            Message::Clear => {
+            Message::FromMenu(menu::Message::Clear) => {
                 self.bezier = bezier::State::default();
                 self.curves.clear();
             }
@@ -109,17 +110,8 @@ impl Application for AppState {
             .padding(20)
             .spacing(20)
             .align_items(Align::Center)
-            .push(
-                Text::new("TODO: menu, scaling, save, export")
-                    .width(Length::Shrink)
-                    .size(50),
-            )
+            .push(self.menu.view().map(Message::FromMenu))
             .push(overlay.map(Message::AddCurve))
-            .push(
-                Button::new(&mut self.button_state, Text::new("Clear"))
-                    .padding(8)
-                    .on_press(Message::Clear),
-            )
             .into()
     }
 }
