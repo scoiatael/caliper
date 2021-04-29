@@ -2,34 +2,14 @@ use iced::{
     executor, image, Align, Application, Clipboard, Column, Command, Container, Element, Length,
     Row, Settings, Text,
 };
-use nfd2::Response;
 
 mod bezier;
 mod canvas_over_image;
+mod dialog;
 mod menu;
 
-#[derive(Debug, Clone)]
-struct OpenDialogError;
-
-impl std::fmt::Display for OpenDialogError {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "got no files to open")
-    }
-}
-
 pub fn main() -> iced::Result {
-    let path = match nfd2::open_file_dialog(Option::Some("png"), None).expect("oh no") {
-        Response::Okay(file_path) => Result::Ok(file_path),
-        Response::OkayMultiple(mut files) => {
-            println!("Got {:?}, using first one.", files);
-            match files.pop() {
-                Option::None => Result::Err(OpenDialogError),
-                Option::Some(file) => Result::Ok(file),
-            }
-        }
-        Response::Cancel => Result::Err(OpenDialogError),
-    }
-    .expect("failed open dialog");
+    let path = dialog::open_file().expect("failed open dialog");
 
     AppState::run(Settings {
         antialiasing: true,
