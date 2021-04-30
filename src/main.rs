@@ -8,6 +8,7 @@ use std::path::PathBuf;
 mod bezier;
 mod canvas_over_image;
 mod dialog;
+mod disk;
 mod export;
 mod menu;
 
@@ -32,6 +33,38 @@ struct AppState {
     sidebar: bool,
 }
 
+impl From<disk::Serialized> for AppState {
+    fn from(s: disk::Serialized) -> Self {
+        AppState {
+            path: s.path.clone(),
+            curves: s.curves(),
+            img: image::Handle::from_path(s.path),
+            bezier: bezier::State::default(),
+            menu: menu::State::default(),
+            sidebar: false,
+        }
+    }
+}
+
+impl Into<disk::Serialized> for &mut AppState {
+    fn into(self) -> disk::Serialized {
+        disk::Serialized::new(self.path.clone(), &self.curves)
+    }
+}
+
+impl From<PathBuf> for AppState {
+    fn from(path: PathBuf) -> Self {
+        AppState {
+            path: path.clone(),
+            img: image::Handle::from_path(path),
+            bezier: bezier::State::default(),
+            curves: bezier::Curves::default(),
+            menu: menu::State::default(),
+            sidebar: false,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy)]
 enum Message {
     AddCurve(bezier::Curve),
@@ -50,15 +83,17 @@ impl Application for AppState {
 
     fn new(flags: Self::Flags) -> (AppState, Command<Self::Message>) {
         let path = flags.file.expect("file missing?");
-        let default = AppState {
-            path: path.clone(),
-            img: image::Handle::from_path(path),
-            bezier: bezier::State::default(),
-            curves: bezier::Curves::default(),
-            menu: menu::State::default(),
-            sidebar: false,
-        };
-        (default, Command::none())
+        match path.extension() {
+            Some(str) => {
+                if str == "clp" {
+                    let serialized = disk::load(&path).expect("failed to load file");
+                    (serialized.into(), Command::none())
+                } else {
+                    (path.into(), Command::none())
+                }
+            }
+            _ => (path.into(), Command::none()),
+        }
     }
 
     fn title(&self) -> String {
@@ -83,8 +118,15 @@ impl Application for AppState {
             }
             Message::FromMenu(menu::Message::Export) => {
                 let mut dst = self.path.clone();
-                dst.set_extension(".clp.svg");
+                dst.set_extension("clp.svg");
                 let _ = export::run(&self.curves, &dst);
+                Command::none()
+            }
+            Message::FromMenu(menu::Message::Save) => {
+                let mut dst = self.path.clone();
+                dst.set_extension("clp");
+                // TODO: Let user know save failed x]
+                let _ = disk::save(self.into(), &dst);
                 Command::none()
             }
         }

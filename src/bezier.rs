@@ -3,6 +3,7 @@ use iced::{
     canvas::{self, Canvas, Cursor, Frame, Geometry, Path, Stroke},
     mouse, Element, Length, Point, Rectangle,
 };
+use std::convert::{Into, TryFrom};
 
 #[derive(Default)]
 pub struct State {
@@ -154,11 +155,40 @@ impl Curve {
             .move_to((self.from.x, self.from.y))
             .quadratic_curve_to(((self.control.x, self.control.y), (self.to.x, self.to.y)));
 
-        return Path::new()
+        Path::new()
             .set("fill", "none")
             .set("stroke", "black")
             .set("stroke-width", 3)
-            .set("d", data);
+            .set("d", data)
+    }
+}
+
+impl TryFrom<&Vec<f32>> for Curve {
+    type Error = std::string::String;
+
+    fn try_from(v: &Vec<f32>) -> Result<Self, Self::Error> {
+        if v.len() == 6 {
+            Ok(Curve {
+                from: Point::new(v[0], v[1]),
+                control: Point::new(v[2], v[3]),
+                to: Point::new(v[4], v[5]),
+            })
+        } else {
+            Err(format!("Source vector must have length 6; got {}", v.len()))
+        }
+    }
+}
+
+impl Into<Vec<f32>> for &Curve {
+    fn into(self) -> Vec<f32> {
+        vec![
+            self.from.x,
+            self.from.y,
+            self.control.x,
+            self.control.y,
+            self.to.x,
+            self.to.y,
+        ]
     }
 }
 

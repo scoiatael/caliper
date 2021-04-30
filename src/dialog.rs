@@ -25,7 +25,7 @@ impl std::fmt::Display for OpenDialogError {
 }
 
 pub fn open_file() -> Result<PathBuf, OpenDialogError> {
-    match nfd2::open_file_dialog(Option::Some("png"), None)? {
+    match nfd2::open_file_dialog(Option::Some("png,clp"), None)? {
         Response::Okay(file_path) => Result::Ok(file_path),
         Response::OkayMultiple(mut files) => {
             println!("Got {:?}, using first one.", files);

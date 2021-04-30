@@ -14,6 +14,7 @@ pub enum Message {
     Clear,
     Sidebar,
     Export,
+    Save,
 }
 
 fn icon<A>(name: &str) -> Element<A> {
@@ -33,7 +34,7 @@ impl State {
             .push(
                 Button::new(&mut self.save, icon("solid/save"))
                     .padding(8)
-                    .on_press(Message::Clear),
+                    .on_press(Message::Save),
             )
             .push(
                 Button::new(&mut self.open, icon("solid/folder-open"))

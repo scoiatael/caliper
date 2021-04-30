@@ -12,3 +12,5 @@ iced_futures = { git = "https://github.com/hecrj/iced" }
 nfd2 = "0.3"
 svg = "0.9"
 tokio = { version = "1", features=["macros", "rt"] }
+serde = { version = "1", features = ["derive"] }
+bincode = "1"
