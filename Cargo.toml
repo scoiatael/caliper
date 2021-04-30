@@ -1,6 +1,6 @@
 [package]
 name = "caliper"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Lukasz Czaplinski <git@scoiatael.dev>"]
 edition = "2018"
 
