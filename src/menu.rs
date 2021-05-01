@@ -4,7 +4,7 @@ use iced::{button, Button, Element, Length, Row, Svg};
 #[derive(Default)]
 pub struct State {
     save: button::State,
-    open: button::State,
+    // open: button::State,
     clear: button::State,
     export: button::State,
     side_bar: button::State,
@@ -37,16 +37,6 @@ impl State {
                 )
                 .padding(8)
                 .on_press(Message::Save),
-            )
-            .push(
-                Button::new(
-                    &mut self.open,
-                    icon(include_bytes!(
-                        "fontawesome-free-5.15.3-desktop/svgs/solid/folder-open.svg"
-                    )),
-                )
-                .padding(8)
-                .on_press(Message::Clear),
             )
             .push(
                 Button::new(
